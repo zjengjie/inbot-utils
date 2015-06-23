@@ -20,6 +20,7 @@ Look at the source code and unit tests for detailed overview. Most of the utilit
 
 Currently these classes are included:
 
+- PasswordHash: we grabbed this implementation from http://crackstation.net/hashing-security.htm and preserved the license info (also MIT). This class implements a secure way of hashing passwords with randomized salt. Don't reinvent this wheel please. Big thanks to Taylor Hornby and his friends at crackstation.net. 
 - AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key
 - ArrayFoo: misc static methods for manipulating arrays and sets
 - CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes
@@ -29,6 +30,7 @@ Currently these classes are included:
 - StrategyEvaluator: varargs and Optional based implementation of the strategy pattern
 - IOUtils: helper methods to quickly work with streams and readers in a responsible way
 - Math: a few methods that are missing from java.lang.Math that are useful
+
 
 This library requires Java 8.
 
@@ -43,5 +45,6 @@ Given the nature of this project and the license, we fully understand if people 
 
 # Changelog
 
+ - 1.2 - Also add the secure password implementation we grabbed from http://crackstation.net/hashing-security.htm; was already MIT licensed
  - 1.1 - Add a few more classes: Md5Appender, IOUtils, Math
  - 1.0 - Initial release
