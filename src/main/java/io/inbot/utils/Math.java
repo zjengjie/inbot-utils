@@ -7,8 +7,8 @@ public class Math {
     /**
      * Java Math.pow has an issue with Long and Integer MIN_VALUE where it returns MIN_VALUE.
      *
-     * @param number
-     * @return
+     * @param number a number
+     * @return the absolute value
      */
     public static long safeAbs(long number) {
         // workaround for common issue where Math.abs returns a negative number for Long.MIN_VALUE
@@ -20,9 +20,9 @@ public class Math {
     }
 
     /**
-     * @param l
-     * @param exp
-     * @return
+     * @param l a long
+     * @param exp exponent
+     * @return l to the power of exp
      */
     public static long pow(long l, int exp) {
         BigInteger bi = BigInteger.valueOf(l).pow(exp);

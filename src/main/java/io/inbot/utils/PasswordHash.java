@@ -54,10 +54,12 @@ public class PasswordHash {
 
     /**
      * Returns a salted PBKDF2 hash of the password.
-     * 
+     *
      * @param password
      *            the password to hash
      * @return a salted PBKDF2 hash of the password
+     * @throws NoSuchAlgorithmException if jdk does not support the algorithm
+     * @throws InvalidKeySpecException if the password or salt are invalid
      */
     public static String createHash(String password) throws NoSuchAlgorithmException, InvalidKeySpecException {
         return createHash(password.toCharArray());
@@ -65,10 +67,12 @@ public class PasswordHash {
 
     /**
      * Returns a salted PBKDF2 hash of the password.
-     * 
+     *
      * @param password
      *            the password to hash
      * @return a salted PBKDF2 hash of the password
+     * @throws NoSuchAlgorithmException if jdk does not support the algorithm
+     * @throws InvalidKeySpecException if the password or salt are invalid
      */
     public static String createHash(char[] password) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Generate a random salt
@@ -84,12 +88,14 @@ public class PasswordHash {
 
     /**
      * Validates a password using a hash.
-     * 
+     *
      * @param password
      *            the password to check
      * @param correctHash
      *            the hash of the valid password
      * @return true if the password is correct, false if not
+     * @throws NoSuchAlgorithmException if jdk does not support the algorithm
+     * @throws InvalidKeySpecException if the password or salt are invalid
      */
     public static boolean validatePassword(String password, String correctHash) throws NoSuchAlgorithmException, InvalidKeySpecException {
         return validatePassword(password.toCharArray(), correctHash);
@@ -97,12 +103,14 @@ public class PasswordHash {
 
     /**
      * Validates a password using a hash.
-     * 
+     *
      * @param password
      *            the password to check
      * @param correctHash
      *            the hash of the valid password
      * @return true if the password is correct, false if not
+     * @throws NoSuchAlgorithmException if jdk does not support the algorithm
+     * @throws InvalidKeySpecException if the password or salt are invalid
      */
     public static boolean validatePassword(char[] password, String correctHash) throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Decode the hash into its parameters
@@ -121,7 +129,7 @@ public class PasswordHash {
     /**
      * Compares two byte arrays in length-constant time. This comparison method is used so that password hashes cannot
      * be extracted from an on-line system using a timing attack and then attacked off-line.
-     * 
+     *
      * @param a
      *            the first byte array
      * @param b
@@ -138,7 +146,6 @@ public class PasswordHash {
 
     /**
      * Computes the PBKDF2 hash of a password.
-     * 
      * @param password
      *            the password to hash.
      * @param salt
@@ -147,7 +154,9 @@ public class PasswordHash {
      *            the iteration count (slowness factor)
      * @param bytes
      *            the length of the hash to compute in bytes
-     * @return the PBDKF2 hash of the password
+     * @return
+     * @throws NoSuchAlgorithmException if jdk does not support the algorithm
+     * @throws InvalidKeySpecException if the password or salt are invalid
      */
     private static byte[] pbkdf2(char[] password, byte[] salt, int iterations, int bytes) throws NoSuchAlgorithmException, InvalidKeySpecException {
         PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, bytes * 8);
@@ -157,7 +166,7 @@ public class PasswordHash {
 
     /**
      * Converts a string of hexadecimal characters into a byte array.
-     * 
+     *
      * @param hex
      *            the hex string
      * @return the hex string decoded into a byte array
@@ -172,7 +181,7 @@ public class PasswordHash {
 
     /**
      * Converts a byte array into a hexadecimal string.
-     * 
+     *
      * @param array
      *            the byte array to convert
      * @return a length*2 character string encoding the byte array
