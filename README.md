@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.3</version>
+  <version>1.4</version>
 </dependency>
 ```
 
@@ -45,6 +45,7 @@ Given the nature of this project and the license, we fully understand if people 
 
 # Changelog
 
+ - 1.4 - add url encode/decode functions to MiscUtils that uses UTF-8 as RFC 3986 recommends and that throw no checked exceptions related to character encoding
  - 1.3 - Minor fixes to javadoc and IOUtils
  - 1.2 - Also add the secure password implementation we grabbed from http://crackstation.net/hashing-security.htm; was already MIT licensed
  - 1.1 - Add a few more classes: Md5Appender, IOUtils, Math
