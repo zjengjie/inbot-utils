@@ -25,7 +25,7 @@ public class IOUtils {
      * Read a resource from the classpath or fallback to treating it as a file.
      * @param resourcePath resource path inside your jar, or a path to an actual file
      * @return BufferedReader
-     * @throws IOException
+     * @throws IOException if something goes wrong with the stream
      */
     public static BufferedReader resource(String resourcePath) throws IOException {
         InputStream is = IOUtils.class.getClassLoader().getResourceAsStream(resourcePath);

@@ -13,6 +13,7 @@ public class StrategyEvaluator {
      * @param suppliers
      *            the strategies that produce Optionals of the desired output type.
      * @return the optional provided by the first successful supplier or Optional.empty()
+     * @param <T> type
      */
     @SafeVarargs
     public static <T> Optional<T> evaluate(Supplier<Optional<T>>...suppliers) {
