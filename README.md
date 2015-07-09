@@ -1,6 +1,6 @@
 # Introduction
 
-Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). These are the kinds of utilities most engineers keep around and copy from project to project.
+Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). 
 
 # Install from maven cental
 
