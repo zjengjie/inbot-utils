@@ -1,10 +1,10 @@
 # Introduction
 
-Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). 
+Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io).
 
 # Install from maven cental
 
-[![Build Status](https://travis-ci.org/Inbot/inbot-datemath.svg)](https://travis-ci.org/Inbot/inbot-datemath)
+[![Build Status](https://travis-ci.org/Inbot/inbot-utils.svg?branch=master)](https://travis-ci.org/Inbot/inbot-utils.svg?branch=master)
 
 ```xml
 <dependency>
