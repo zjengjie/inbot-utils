@@ -4,7 +4,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 
 # Install from maven cental
 
-[![Build Status](https://travis-ci.org/Inbot/inbot-utils.svg?branch=master)](https://travis-ci.org/Inbot/inbot-utils.svg?branch=master)
+[![Build Status](https://travis-ci.org/Inbot/inbot-utils.svg?branch=master)](https://travis-ci.org/Inbot/inbot-utils)
 
 ```xml
 <dependency>
