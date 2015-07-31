@@ -2,6 +2,7 @@ package io.inbot.utils;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -16,7 +17,8 @@ public class ArrayFoo {
         if(arrays.length == 1) {
             return arrays[0];
         }
-        ArrayList<T> list = new ArrayList<T>(1000);
+        int totalSize = Arrays.stream(arrays).mapToInt(a->a.length).sum();
+        ArrayList<T> list = new ArrayList<T>(totalSize);
         for(T[] ts: arrays) {
             for(T t:ts) {
                 list.add(t);
@@ -37,6 +39,18 @@ public class ArrayFoo {
 
     public static <T> String stringify(T[] ts) {
         return "["+ StringUtils.join(ts,',') +"]";
+    }
+
+    public static <T> boolean arrayContains(T[] ts, T value) {
+        if(ts==null) {
+            return false;
+        }
+        for(T t:ts) {
+            if(t.equals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @SafeVarargs
