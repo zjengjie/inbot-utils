@@ -8,6 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -116,7 +117,7 @@ public class HashUtils {
         String id;
         id = md5(UUID.randomUUID().toString());
         // don't generate ids that start with _ (messes up couchdb) or contain the string null (messes up our tests).
-        while(id.startsWith("_") || id.toLowerCase().contains("null")) {
+        while(id.startsWith("_") || id.toLowerCase(Locale.ENGLISH).contains("null")) {
             id = md5(UUID.randomUUID().toString());
         }
         return id;
@@ -133,7 +134,7 @@ public class HashUtils {
 
     public static String secureToken() {
         String tok;
-        while((tok = new BigInteger(128, SECURE_RANDOM).toString(32)).toLowerCase().contains("null")) {
+        while((tok = new BigInteger(128, SECURE_RANDOM).toString(32)).toLowerCase(Locale.ENGLISH).contains("null")) {
             ;
         }
         return tok;
