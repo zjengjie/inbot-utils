@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 /**
  * Nice simple factory for creating maps quickly. Add hasMap and entry as static imports and you can write stuff like
  *
- * Map<String,Integer> map = hashMap(entry("one",1),entry("two",2));
+ * Map&lt;String,Integer&gt; map = hashMap(entry(&quot;one&quot;,1),entry(&quot;two&quot;,2));
  *
  * Use map with a supplier to create maps of any type.
  *
