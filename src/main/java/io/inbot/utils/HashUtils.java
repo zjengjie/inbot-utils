@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class HashUtils {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
