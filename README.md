@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.5</version>
+  <version>1.7</version>
 </dependency>
 ```
 
@@ -44,6 +44,9 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+ - 1.7
+   - use latest commons-lang
+ - 1.6 - broken release; skip
  - 1.5
    - add map factory similar to Jsonj object factory
    - use locale in call to toLowerCase
