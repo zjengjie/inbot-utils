@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.9</version>
+  <version>1.10</version>
 </dependency>
 ```
 
@@ -26,6 +26,7 @@ Currently these classes are included:
 - CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes
 - HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up
 - Md5Appender: helper class to creat md5 hashes incrementally by appending objects to it.
+- Md5Stream: helper class to build up an md5 stream from an outputstream. Useful when generating e.g. ETags by serializing large object structures without buffering the entire thing in memory.
 - MiscUtils: equalsAny method that returns true if the first arg is equal to any of the remaining ones (varargs)
 - StrategyEvaluator: varargs and Optional based implementation of the strategy pattern
 - IOUtils: helper methods to quickly work with streams and readers in a responsible way
@@ -45,6 +46,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+ - 1.10
+  - add Md5Stream 
  - 1.9
   - add MdcContext
  - 1.8
