@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.8</version>
+  <version>1.9</version>
 </dependency>
 ```
 
@@ -30,6 +30,7 @@ Currently these classes are included:
 - StrategyEvaluator: varargs and Optional based implementation of the strategy pattern
 - IOUtils: helper methods to quickly work with streams and readers in a responsible way
 - Math: a few methods that are missing from java.lang.Math that are useful
+- MdcContext to have a way of temporarily adding attributes to the logging MDC with cleanup. MdcContext implements Closeable so you can use `try...finally`
 
 
 This library requires Java 8.
@@ -44,6 +45,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+ - 1.9
+  - add MdcContext
  - 1.8
   - add normalize function to Math for normalizing numeric values to something between 0 and 1 (based on a simple logistic function)
   - add int version of safeAbs to Math
