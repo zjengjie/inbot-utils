@@ -51,7 +51,10 @@ public class Math {
     /**
      * Useful for normalizing integer or double values to a number between 0 and 1.
      * This uses a simple logistic function: https://en.wikipedia.org/wiki/Logistic_function
-     * with some small adaptations.
+     * with some small adaptations:
+     * <pre>
+     * (1 / (1 + java.lang.Math.exp(-1 * (factor * i))) - 0.5) * 2
+     * </pre>
      *
      * @param i
      *            any positive long
