@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.util.regex.Pattern;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -21,19 +22,21 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
 /**
- * Helper methods to assist with encryption/decryption using AES.
+ * Helper methods to assist with encryption/decryption using AES that implements https://tools.ietf.org/html/rfc2898 style encryption/decryption with
+ * some sane defaults.
  *
  * The plaintext is encrypted with a secure random salt so that every encrypted value is unique.
  *
- * You can choose between using your own 256 bit key or using a salt + password from which a 256 bit key is constructed.
+ * You can choose between using your own 256 bit key or using a salt + password from which a 256 bit key is constructed using PBKDF2WithHmacSHA1.
  *
  * The encrypted value includes a md5 content hash that is used by the decrypt to verify the value is correct. This
- * guarantees the decrypt fails with an UnauthorizedException if the key/password is incorrect and prevents the
+ * guarantees the decrypt fails with an IllegalArgumentException if the key/password is incorrect and prevents the
  * algorithm from returning random garbage instead.
  */
 public class AESUtils {
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+    private static final Pattern SPLIT_PATTERN = Pattern.compile("\\$");
 
     static {
         // Change security policy to unlimited strength programmatically
@@ -67,46 +70,47 @@ public class AESUtils {
      * @return plain text.
      */
     public static String decrypt(String salt, String password, String input) {
-        SecretKey secret = getKey(salt, password);
+        SecretKey secretKey = getKey(salt, password);
 
-        return decrypt(secret, input);
+        return decrypt(secretKey, input);
     }
 
     /**
      * Decrypt text that was encrypted with the provided encrypt method in this class.
      *
-     * @param key
+     * @param key256Bits
      *            256 bit key
      * @param encrypted
      *            encrypted text
      * @return plain text
      */
-    public static String decrypt(byte[] key, String encrypted) {
-        SecretKey secret = new SecretKeySpec(key, "AES");
-        return decrypt(secret, encrypted);
+    public static String decrypt(byte[] key256Bits, String encrypted) {
+        SecretKey secretKey = new SecretKeySpec(key256Bits, "AES");
+        return decrypt(secretKey, encrypted);
     }
 
     /**
      * Decrypt text that was encrypted with the provided encrypt method in this class.
      *
-     * @param key
+     * @param keyBase64
      *            256 bit key base64 encoded
      * @param encrypted
      *            encrypted text
      * @return plain text
      */
-    public static String decrypt(String key, String encrypted) {
-        SecretKey secret = new SecretKeySpec(Base64.decodeBase64(key.getBytes(StandardCharsets.UTF_8)), "AES");
-        return decrypt(secret, encrypted);
+    public static String decrypt(String keyBase64, String encrypted) {
+        SecretKey secretKey = new SecretKeySpec(Base64.decodeBase64(keyBase64.getBytes(StandardCharsets.UTF_8)), "AES");
+        return decrypt(secretKey, encrypted);
     }
 
     private static String decrypt(SecretKey secret, String input) {
         try {
-            // Convert url-safe base64 to normal base64
+            // Convert url-safe base64 to normal base64, remove carriage returns
             input = input.replaceAll("-", "+").replaceAll("_", "/").replaceAll("\r", "").replaceAll("\n", "");
-            String[] splitedInput = input.split("\\$");
-            byte[] iv = hexStringToByteArray(splitedInput[0]);
-            byte[] hash = Base64.decodeBase64(splitedInput[1]);
+
+            String[] splitInput = SPLIT_PATTERN.split(input);
+            byte[] iv = hexStringToByteArray(splitInput[0]);
+            byte[] hash = Base64.decodeBase64(splitInput[1]);
 
             String plaintext;
 
@@ -116,33 +120,37 @@ public class AESUtils {
             // Needs external dependency like 'bouncy castle'
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
             plaintext = new String(cipher.doFinal(hash), "UTF-8");
-            String md5 = plaintext.substring(0, 22);
+
+            // this allows us to detect key mismatches, without this it would be possible to return garbage content if the padding happens to be right
+            String md5Hash = plaintext.substring(0, 22);
             String plainTextWithoutHash = plaintext.substring(22);
-            if (md5.equals(HashUtils.md5(plainTextWithoutHash))) {
+            if (md5Hash.equals(HashUtils.md5(plainTextWithoutHash))) {
                 return plainTextWithoutHash;
             } else {
                 throw new IllegalArgumentException("wrong aes key - incorrect content hash");
             }
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException
                 | UnsupportedEncodingException e) {
+            // should not happen but if it does, we're likely using some wonky jvm
             throw new IllegalStateException("cannot decrypt: " + e.getMessage(), e);
         } catch (InvalidKeyException | BadPaddingException e) {
-            throw new IllegalArgumentException("wrong aes key");
+            // the key was wrong
+            throw new IllegalArgumentException("wrong aes key", e);
         }
     }
 
     /**
      * Encrypt the plain text.
      *
-     * @param key
+     * @param key256Bits
      *            256 bit key
      * @param plainText
      *            text that needs to be encrypted
      * @return the iv as a hex string followed by '$' followed by the encrypted text.
      */
-    public static String encrypt(byte[] key, String plainText) {
-        SecretKey secret = new SecretKeySpec(key, "AES");
-        return encrypt(secret, plainText);
+    public static String encrypt(byte[] key256Bits, String plainText) {
+        SecretKey secretKey = new SecretKeySpec(key256Bits, "AES");
+        return encrypt(secretKey, plainText);
     }
 
     /**
@@ -216,6 +224,8 @@ public class AESUtils {
 
     private static SecretKey getKey(String salt, String password) {
         try {
+            // https://tools.ietf.org/html/rfc2898
+            // sha1 with 1000 iterations and 256 bits is good enough here http://stackoverflow.com/questions/6126061/pbekeyspec-what-do-the-iterationcount-and-keylength-parameters-influence
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 1000, 256);
             SecretKey tmp = factory.generateSecret(spec);
