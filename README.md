@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.10</version>
+  <version>1.11</version>
 </dependency>
 ```
 
@@ -46,22 +46,24 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
- - 1.10
-  - add Md5Stream 
- - 1.9
+- 1.11
+  - Minor performance tweak on AESUtils, additional round method in Math
+- 1.10
+  - add Md5Stream
+- 1.9
   - add MdcContext
- - 1.8
+- 1.8
   - add normalize function to Math for normalizing numeric values to something between 0 and 1 (based on a simple logistic function)
   - add int version of safeAbs to Math
- - 1.7
+- 1.7
    - use latest commons-lang
- - 1.6 - broken release; skip
- - 1.5
+- 1.6 - broken release; skip
+- 1.5
    - add map factory similar to Jsonj object factory
    - use locale in call to toLowerCase
    - improve ArrayFoo.combine to allocate correct size for ArrayList
- - 1.4 - add url encode/decode functions to MiscUtils that uses UTF-8 as RFC 3986 recommends and that throw no checked exceptions related to character encoding
- - 1.3 - Minor fixes to javadoc and IOUtils
- - 1.2 - Also add the secure password implementation we grabbed from http://crackstation.net/hashing-security.htm; was already MIT licensed
- - 1.1 - Add a few more classes: Md5Appender, IOUtils, Math
- - 1.0 - Initial release
+- 1.4 - add url encode/decode functions to MiscUtils that uses UTF-8 as RFC 3986 recommends and that throw no checked exceptions related to character encoding
+- 1.3 - Minor fixes to javadoc and IOUtils
+- 1.2 - Also add the secure password implementation we grabbed from http://crackstation.net/hashing-security.htm; was already MIT licensed
+- 1.1 - Add a few more classes: Md5Appender, IOUtils, Math
+- 1.0 - Initial release
