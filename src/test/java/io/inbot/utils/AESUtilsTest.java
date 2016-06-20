@@ -1,28 +1,26 @@
 package io.inbot.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.inbot.utils.AESUtils;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.Set;
 import org.testng.annotations.Test;
 
 
 @Test
 public class AESUtilsTest {
 
-    public void shouldConvertToFromHex() throws Exception {
+    public void shouldConvertToFromHex() {
         byte[] iv = new byte[20];
         new SecureRandom().nextBytes(iv);
         String hexString = AESUtils.byteArrayToHexString(iv);
         byte[] bytes = AESUtils.hexStringToByteArray(hexString);
-        assertThat(bytes).isEqualTo(iv); 
+        assertThat(bytes).isEqualTo(iv);
     }
 
     public void shouldEncryptAndDecryptUsingSaltAndPassword() {
-        String plainText = "secretsecret";
-        String encrypted = AESUtils.encrypt("salt", "password", plainText);
-        assertThat(AESUtils.decrypt("salt", "password", encrypted)).isEqualTo(plainText); 
+        assertThat(AESUtils.decrypt("salt", "password", AESUtils.encrypt("salt", "password", "secretsecret"))).isEqualTo("secretsecret");
     }
 
     public void shouldEncryptAndDecryptUsing256BitKey() {
@@ -30,13 +28,37 @@ public class AESUtilsTest {
         new SecureRandom().nextBytes(key);
         String plainText = "secretsecret";
         String encrypted = AESUtils.encrypt(key, plainText);
-        assertThat(AESUtils.decrypt(key, encrypted)).isEqualTo(plainText); 
+        assertThat(AESUtils.decrypt(key, encrypted)).isEqualTo(plainText);
     }
 
     public void shouldEncryptAndDecryptUsingGenerated256BitBase64Key() {
         String plainText = "secretsecret";
         String key = AESUtils.generateAesKey();
         String encrypted = AESUtils.encrypt(key, plainText);
-        assertThat(AESUtils.decrypt(key, encrypted)).isEqualTo(plainText); 
+        assertThat(AESUtils.decrypt(key, encrypted)).isEqualTo(plainText);
+    }
+
+    public void shouldPreserveCompatibility() {
+        String encrypted="B8B32CCF0471B3FA305C3DF04D879E79$5or2YFCkt50EtCnqakG4KyMRItErJyIHhflVlNZTAVLxLwSWFEHDeWfpvyZ4z8lG";
+        assertThat(AESUtils.decrypt("salt", "password", encrypted)).isEqualTo("secretsecret");
+    }
+
+    public void shouldNotGenerateSameEncryptedEver() {
+        Set<String> encrypted= new HashSet<>();
+        for(int i=0;i<100;i++) {
+            // each encrypted value is hashed
+            encrypted.add(AESUtils.encrypt("salt", "password", "secretsecret"));
+        }
+        assertThat(encrypted.size()).isEqualTo(100);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void shouldThrowExecptionForIncorrectPassword() {
+        AESUtils.decrypt("salt", "passwd", AESUtils.encrypt("salt", "password", "secretsecret"));
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void shouldThrowExecptionForIncorrectSalt() {
+        AESUtils.decrypt("slt", "password", AESUtils.encrypt("salt", "password", "secretsecret"));
     }
 }
