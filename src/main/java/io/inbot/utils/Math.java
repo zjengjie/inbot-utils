@@ -67,4 +67,11 @@ public class Math {
         Validate.isTrue(i >= 0, "should be positive value");
         return (1 / (1 + java.lang.Math.exp(-1 * (factor * i))) - 0.5) * 2;
     }
+
+    public static double round(double number, int decimals) {
+        Validate.isTrue(number != 0, "should not be 0");
+        Validate.isTrue(decimals != 0, "should not be 0");
+        int temp = (int) (number * Math.pow(10, decimals));
+        return ((double) temp) / Math.pow(10, decimals);
+    }
 }
