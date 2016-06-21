@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.11</version>
+  <version>1.12</version>
 </dependency>
 ```
 
@@ -29,6 +29,7 @@ Currently these classes are included:
 - Md5Stream: helper class to build up an md5 stream from an outputstream. Useful when generating e.g. ETags by serializing large object structures without buffering the entire thing in memory.
 - MiscUtils: equalsAny method that returns true if the first arg is equal to any of the remaining ones (varargs)
 - StrategyEvaluator: varargs and Optional based implementation of the strategy pattern
+- PatternEvaluator: lambda functions based implementation of matching a pattern and then doing something like you can in many functional languages.
 - IOUtils: helper methods to quickly work with streams and readers in a responsible way
 - Math: a few methods that are missing from java.lang.Math that are useful
 - MdcContext to have a way of temporarily adding attributes to the logging MDC with cleanup. MdcContext implements Closeable so you can use `try...finally`
@@ -46,6 +47,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.12
+  - Add PatternEvaluator inspired by https://kerflyn.wordpress.com/2012/05/09/towards-pattern-matching-in-java/. This allows for a more functional style of programming in Java similar to what you would do in e.g. Haskell, Kotlin, or Scala. Mind you this is still Java, so beware tedious syntax and some runtime overhead.
 - 1.11
   - Minor performance tweak on AESUtils, additional round method in Math
 - 1.10
