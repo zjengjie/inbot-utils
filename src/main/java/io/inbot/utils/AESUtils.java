@@ -1,25 +1,28 @@
 package io.inbot.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.util.regex.Pattern;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.crypto.BufferedBlockCipher;
+import org.bouncycastle.crypto.CipherParameters;
+import org.bouncycastle.crypto.DataLengthException;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Helper methods to assist with encryption/decryption using AES that implements https://tools.ietf.org/html/rfc2898 style encryption/decryption with
@@ -39,17 +42,7 @@ public class AESUtils {
     private static final Pattern SPLIT_PATTERN = Pattern.compile("\\$");
 
     static {
-        // Change security policy to unlimited strength programmatically
-        try {
-            Class<?> securityClass = Class.forName("javax.crypto.JceSecurity");
-            Field restrictedField = securityClass.getDeclaredField("isRestricted");
-            restrictedField.setAccessible(true);
-            // restrictedField.set nil, false
-            restrictedField.setBoolean(null, false);
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            // if this doesn't work; we are on an incompatible JVM
-            throw new IllegalStateException("cannot override java crypto restrictions; use a compatible jvm");
-        }
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     public static String generateAesKey() {
@@ -72,7 +65,7 @@ public class AESUtils {
     public static String decrypt(String salt, String password, String input) {
         SecretKey secretKey = getKey(salt, password);
 
-        return decrypt(secretKey, input);
+        return decryptBouncyCastle(secretKey, input);
     }
 
     /**
@@ -86,7 +79,7 @@ public class AESUtils {
      */
     public static String decrypt(byte[] key256Bits, String encrypted) {
         SecretKey secretKey = new SecretKeySpec(key256Bits, "AES");
-        return decrypt(secretKey, encrypted);
+        return decryptBouncyCastle(secretKey, encrypted);
     }
 
     /**
@@ -100,10 +93,40 @@ public class AESUtils {
      */
     public static String decrypt(String keyBase64, String encrypted) {
         SecretKey secretKey = new SecretKeySpec(Base64.decodeBase64(keyBase64.getBytes(StandardCharsets.UTF_8)), "AES");
-        return decrypt(secretKey, encrypted);
+        return decryptBouncyCastle(secretKey, encrypted);
     }
 
-    private static String decrypt(SecretKey secret, String input) {
+    private static String encryptBouncyCastle(SecretKey secret, String plainText) {
+        try {
+            String md5 = HashUtils.md5(plainText);
+            plainText = md5 + plainText;
+            byte[] iv = new byte[16];
+            SECURE_RANDOM.nextBytes(iv);
+
+            // setup cipher parameters with key and IV
+            byte[] key = secret.getEncoded();
+            // setup AES cipher in CBC mode with PKCS7 padding
+            BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), new PKCS7Padding());
+
+            cipher.reset();
+            cipher.init(true, new ParametersWithIV(new KeyParameter(key), iv));
+
+            byte[] plainTextBuf = plainText.getBytes(StandardCharsets.UTF_8);
+            byte[] buf = new byte[cipher.getOutputSize(plainTextBuf.length)];
+
+            int len = cipher.processBytes(plainTextBuf, 0, plainTextBuf.length, buf, 0);
+            len += cipher.doFinal(buf, len);
+
+            byte[] out = new byte[len];
+            System.arraycopy(buf, 0, out, 0, len);
+
+            return byteArrayToHexString(iv) + "$" + new String(Base64.encodeBase64URLSafe(out), StandardCharsets.UTF_8);
+        } catch (DataLengthException | InvalidCipherTextException e) {
+            throw new IllegalStateException("cannot encrypt", e);
+        }
+    }
+
+    private static String decryptBouncyCastle(SecretKey secret, String input) {
         try {
             // Convert url-safe base64 to normal base64, remove carriage returns
             input = input.replaceAll("-", "+").replaceAll("_", "/").replaceAll("\r", "").replaceAll("\n", "");
@@ -112,30 +135,42 @@ public class AESUtils {
             byte[] iv = hexStringToByteArray(splitInput[0]);
             byte[] hash = Base64.decodeBase64(splitInput[1]);
 
-            String plaintext;
+            // get raw key from password and salt
+            byte[] key = secret.getEncoded();
 
-            // Internally PKCS7 is used
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            // Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-            // Needs external dependency like 'bouncy castle'
-            cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
-            plaintext = new String(cipher.doFinal(hash), "UTF-8");
+            // setup cipher parameters with key and IV
+            KeyParameter keyParam = new KeyParameter(key);
+            CipherParameters params = new ParametersWithIV(keyParam, iv);
 
-            // this allows us to detect key mismatches, without this it would be possible to return garbage content if the padding happens to be right
+            // setup AES cipher in CBC mode with PKCS7 padding
+            BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), new PKCS7Padding());
+
+            cipher.reset();
+            cipher.init(false, params);
+
+            // create a temporary buffer to decode into (it'll include padding)
+            byte[] buf = new byte[cipher.getOutputSize(hash.length)];
+            int len = cipher.processBytes(hash, 0, hash.length, buf, 0);
+            len += cipher.doFinal(buf, len);
+
+            // lose the padding
+            byte[] out = new byte[len];
+            System.arraycopy(buf, 0, out, 0, len);
+            // lose the salt
+
+            String plaintext = new String(out, StandardCharsets.UTF_8);
             String md5Hash = plaintext.substring(0, 22);
             String plainTextWithoutHash = plaintext.substring(22);
             if (md5Hash.equals(HashUtils.md5(plainTextWithoutHash))) {
                 return plainTextWithoutHash;
             } else {
+                // it's possible to decrypt to garbage with the wrong key; the md5 check helps detecting that
                 throw new IllegalArgumentException("wrong aes key - incorrect content hash");
             }
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException
-                | UnsupportedEncodingException e) {
-            // should not happen but if it does, we're likely using some wonky jvm
-            throw new IllegalStateException("cannot decrypt: " + e.getMessage(), e);
-        } catch (InvalidKeyException | BadPaddingException e) {
-            // the key was wrong
-            throw new IllegalArgumentException("wrong aes key", e);
+        } catch (DataLengthException e) {
+            throw new IllegalStateException("buffer not big enough",e);
+        } catch (InvalidCipherTextException e) {
+            throw new IllegalArgumentException("wrong password");
         }
     }
 
@@ -150,7 +185,8 @@ public class AESUtils {
      */
     public static String encrypt(byte[] key256Bits, String plainText) {
         SecretKey secretKey = new SecretKeySpec(key256Bits, "AES");
-        return encrypt(secretKey, plainText);
+        return encryptBouncyCastle(secretKey, plainText);
+//        return encryptLegacyJavaSecurity(secretKey, plainText);
     }
 
     /**
@@ -164,7 +200,7 @@ public class AESUtils {
      */
     public static String encrypt(String key, String plainText) {
         SecretKey secret = new SecretKeySpec(Base64.decodeBase64(key.getBytes()), "AES");
-        return encrypt(secret, plainText);
+        return encryptBouncyCastle(secret, plainText);
     }
 
     /**
@@ -180,29 +216,7 @@ public class AESUtils {
      */
     public static String encrypt(String salt, String password, String plainText) {
         SecretKey secret = getKey(salt, password);
-        return encrypt(secret, plainText);
-    }
-
-    private static String encrypt(SecretKey secret, String plainText) {
-        try {
-            String md5 = HashUtils.md5(plainText);
-            plainText = md5 + plainText;
-            byte[] iv = new byte[16];
-            SECURE_RANDOM.nextBytes(iv);
-
-            // Internally PKCS7 is used
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-            // Cipher cipher = Cipher.getInstance("AES/CBC/PKCS7Padding");
-            // Needs external dependency like 'bouncy castle'
-            cipher.init(Cipher.ENCRYPT_MODE, secret, new IvParameterSpec(iv));
-            byte[] encrypted = cipher.doFinal(plainText.getBytes());
-            return byteArrayToHexString(iv) + "$" + new String(Base64.encodeBase64URLSafe(encrypted), "UTF-8");
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException
-                | UnsupportedEncodingException e) {
-            throw new IllegalStateException("cannot encrypt: " + e.getMessage(), e);
-        } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException("wrong aes key");
-        }
+        return encryptBouncyCastle(secret, plainText);
     }
 
     public static byte[] hexStringToByteArray(String s) {

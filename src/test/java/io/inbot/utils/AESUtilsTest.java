@@ -38,9 +38,18 @@ public class AESUtilsTest {
         assertThat(AESUtils.decrypt(key, encrypted)).isEqualTo(plainText);
     }
 
-    public void shouldPreserveCompatibility() {
+    public void shouldPreserveCompatibilityWithPreJdk101AES256() {
         String encrypted="B8B32CCF0471B3FA305C3DF04D879E79$5or2YFCkt50EtCnqakG4KyMRItErJyIHhflVlNZTAVLxLwSWFEHDeWfpvyZ4z8lG";
-        assertThat(AESUtils.decrypt("salt", "password", encrypted)).isEqualTo("secretsecret");
+        String decrypted = AESUtils.decrypt("salt", "password", encrypted);
+        String expected = "secretsecret";
+        assertThat(decrypted.length()).isEqualTo(expected.length());
+        assertThat(decrypted).isEqualTo(expected);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void shouldPreserveCompatibilityWithPreJdk101AES256WrongPassword() {
+        String encrypted="B8B32CCF0471B3FA305C3DF04D879E79$5or2YFCkt50EtCnqakG4KyMRItErJyIHhflVlNZTAVLxLwSWFEHDeWfpvyZ4z8lG";
+        AESUtils.decrypt("salt", "wrongpassword", encrypted);
     }
 
     public void shouldNotGenerateSameEncryptedEver() {
