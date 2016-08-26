@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.12</version>
+  <version>1.13</version>
 </dependency>
 ```
 
@@ -47,6 +47,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.13
+  - Change AESUtils to rely on the bouncycastle library instead of JDK bundled ciphers. This change is backward/forward compatible. Reason for the change is that as of JDK 8 u101, 256 bit key length can no longer be forced without installing a jdk policy package due to some internal changes. Bouncycastle does not have this restriction and therefore is a bit more robust to get working.
 - 1.12
   - Add PatternEvaluator inspired by https://kerflyn.wordpress.com/2012/05/09/towards-pattern-matching-in-java/. This allows for a more functional style of programming in Java similar to what you would do in e.g. Haskell, Kotlin, or Scala. Mind you this is still Java, so beware tedious syntax and some runtime overhead.
 - 1.11
