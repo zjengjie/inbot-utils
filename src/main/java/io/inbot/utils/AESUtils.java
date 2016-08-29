@@ -63,9 +63,7 @@ public class AESUtils {
      * @return plain text.
      */
     public static String decrypt(String salt, String password, String input) {
-        SecretKey secretKey = getKey(salt, password);
-
-        return decryptBouncyCastle(secretKey, input);
+        return decryptBouncyCastle(getKey(salt, password), input);
     }
 
     /**
@@ -92,19 +90,24 @@ public class AESUtils {
      * @return plain text
      */
     public static String decrypt(String keyBase64, String encrypted) {
-        SecretKey secretKey = new SecretKeySpec(Base64.decodeBase64(keyBase64.getBytes(StandardCharsets.UTF_8)), "AES");
-        return decryptBouncyCastle(secretKey, encrypted);
+        return decrypt(Base64.decodeBase64(keyBase64.getBytes(StandardCharsets.UTF_8)), encrypted);
     }
 
     private static String encryptBouncyCastle(SecretKey secret, String plainText) {
         try {
+            // prepending with md5 hash allows us to do an integrity check on decrypt to prevent returning garbage if the decrypt key is incorrect
             String md5 = HashUtils.md5(plainText);
             plainText = md5 + plainText;
+
+            // the iv acts as a per use salt, this ensures things encrypted with the same key always have a unique salt
+            // 128 bit iv because NIST AES is standardized with 128 bit blocks and iv needs to match block size, even when using 256 bit key
             byte[] iv = new byte[16];
             SECURE_RANDOM.nextBytes(iv);
 
             // setup cipher parameters with key and IV
             byte[] key = secret.getEncoded();
+
+
             // setup AES cipher in CBC mode with PKCS7 padding
             BufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()), new PKCS7Padding());
 
@@ -112,14 +115,17 @@ public class AESUtils {
             cipher.init(true, new ParametersWithIV(new KeyParameter(key), iv));
 
             byte[] plainTextBuf = plainText.getBytes(StandardCharsets.UTF_8);
+
             byte[] buf = new byte[cipher.getOutputSize(plainTextBuf.length)];
 
             int len = cipher.processBytes(plainTextBuf, 0, plainTextBuf.length, buf, 0);
             len += cipher.doFinal(buf, len);
 
+            // copy the encrypted part of the buffer to out
             byte[] out = new byte[len];
             System.arraycopy(buf, 0, out, 0, len);
 
+            // iv$encrypted
             return byteArrayToHexString(iv) + "$" + new String(Base64.encodeBase64URLSafe(out), StandardCharsets.UTF_8);
         } catch (DataLengthException | InvalidCipherTextException e) {
             throw new IllegalStateException("cannot encrypt", e);
@@ -133,7 +139,7 @@ public class AESUtils {
 
             String[] splitInput = SPLIT_PATTERN.split(input);
             byte[] iv = hexStringToByteArray(splitInput[0]);
-            byte[] hash = Base64.decodeBase64(splitInput[1]);
+            byte[] encrypted = Base64.decodeBase64(splitInput[1]);
 
             // get raw key from password and salt
             byte[] key = secret.getEncoded();
@@ -149,8 +155,8 @@ public class AESUtils {
             cipher.init(false, params);
 
             // create a temporary buffer to decode into (it'll include padding)
-            byte[] buf = new byte[cipher.getOutputSize(hash.length)];
-            int len = cipher.processBytes(hash, 0, hash.length, buf, 0);
+            byte[] buf = new byte[cipher.getOutputSize(encrypted.length)];
+            int len = cipher.processBytes(encrypted, 0, encrypted.length, buf, 0);
             len += cipher.doFinal(buf, len);
 
             // lose the padding
