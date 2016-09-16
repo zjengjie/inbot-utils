@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.13</version>
+  <version>1.14</version>
 </dependency>
 ```
 
@@ -47,6 +47,9 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.14
+  - ReinitializingReference added, useful for things that you want to periodically recalculate in a thread safe way
+  - Add IOUtils.lines(String resourcename) method
 - 1.13
   - Change AESUtils to rely on the bouncycastle library instead of JDK bundled ciphers. This change is backward/forward compatible. Reason for the change is that as of JDK 8 u101, 256 bit key length can no longer be forced without installing a jdk policy package due to some internal changes. Bouncycastle does not have this restriction and therefore is a bit more robust to get working.
 - 1.12
