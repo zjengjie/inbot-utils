@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -92,5 +93,13 @@ public class IOUtils {
 
     public static String readString(InputStream is) {
         return readString(new BufferedReader(new InputStreamReader(is, UTF_8)));
+    }
+
+    public static Stream<String> lines(String resourceOrFile) {
+        try {
+            return resource(resourceOrFile).lines();
+        } catch (IOException e) {
+            throw new IllegalStateException("cannot read resouce",e);
+        }
     }
 }
