@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.14</version>
+  <version>1.15</version>
 </dependency>
 ```
 
@@ -47,6 +47,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.15
+  - Add SimpleStringTrie (we needed a Trie)
 - 1.14
   - ReinitializingReference added, useful for things that you want to periodically recalculate in a thread safe way
   - Add IOUtils.lines(String resourcename) method
