@@ -21,8 +21,8 @@ Look at the source code and unit tests for detailed overview. Most of the utilit
 Currently these classes are included:
 
 - PasswordHash: we grabbed this implementation from http://crackstation.net/hashing-security.htm and preserved the license info (also MIT). This class implements a secure way of hashing passwords with randomized salt. Don't reinvent this wheel please. Big thanks to Taylor Hornby and his friends at crackstation.net.
-- AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key. This makes encryption easy and safe.
-- ArrayFoo: misc static methods for manipulating arrays and sets. I like my varargs.
+- AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key. This makes encryption easy, safe (AES cipher in CBC mode with PKCS7, 256 bit key), and free of boilerplate. Uses the bouncy-castle library so you don't have to deal with Oracle's restrictions on key length.
+- ArrayFoo: misc static methods for manipulating arrays and sets.
 - CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes. Reduce the amount of boiler plate needed for the simple job of compressing stuff.
 - HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up. 
 - Md5Appender: helper class to creat md5 hashes incrementally by appending objects to it. We use this for Etags.
