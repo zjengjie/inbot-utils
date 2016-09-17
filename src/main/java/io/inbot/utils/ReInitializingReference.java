@@ -5,7 +5,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class ReInitializingReference<V> {
-    private V instance;
+    private volatile V instance;
     private final Supplier<V> initializer;
     private final ReentrantLock lock = new ReentrantLock();
     private long lastInitialized=0;
