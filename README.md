@@ -33,6 +33,7 @@ Currently these classes are included:
 - IOUtils: helper methods to quickly work with streams and readers in a responsible way. Java IO requires a lot of boilerplate; this makes that a bit less verbose.
 - Math: a few methods that are missing from java.lang.Math that are useful to have around: `safeAbs` (the existing abs has edgecases), `long pow(long l, int exp)`, `double normalize(double i, double factor)` simple logistic function for getting a value between 0 and 1, `double round(double d, int decimals)`
 - MdcContext to have a way of temporarily adding attributes to the logging MDC with cleanup. MdcContext implements Closeable so you can use `try...finally`
+- ReinitializingReference - allows you to periodically calculate something expensive in a thread safe way. When you get the reference, it checks whether it needs to be recalculated and if needed does so (blocks until done). If you've ever implemented double checked locking (or made the rooky mistake of not doing double locking or doing it wrong) to do something similar, this is a cleaner and safer way.
 - SimpleStringTrie - a straightforward implemnentation of a Trie that uses HashMaps to implement a simple prefix tree. Nothing special, but we needed one and could not be bothered to pull in e.g. Apache Commons Collections.
 
 
