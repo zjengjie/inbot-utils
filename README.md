@@ -1,6 +1,6 @@
 # Introduction
 
-Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io).
+Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). It's where we put anything reusable/valuable enough that it would be inconvenient to not have around.
 
 # Install from maven cental
 
@@ -21,18 +21,19 @@ Look at the source code and unit tests for detailed overview. Most of the utilit
 Currently these classes are included:
 
 - PasswordHash: we grabbed this implementation from http://crackstation.net/hashing-security.htm and preserved the license info (also MIT). This class implements a secure way of hashing passwords with randomized salt. Don't reinvent this wheel please. Big thanks to Taylor Hornby and his friends at crackstation.net.
-- AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key
-- ArrayFoo: misc static methods for manipulating arrays and sets
-- CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes
-- HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up
-- Md5Appender: helper class to creat md5 hashes incrementally by appending objects to it.
-- Md5Stream: helper class to build up an md5 stream from an outputstream. Useful when generating e.g. ETags by serializing large object structures without buffering the entire thing in memory.
+- AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key. This makes encryption easy and safe.
+- ArrayFoo: misc static methods for manipulating arrays and sets. I like my varargs.
+- CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes. Reduce the amount of boiler plate needed for the simple job of compressing stuff.
+- HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up. 
+- Md5Appender: helper class to creat md5 hashes incrementally by appending objects to it. We use this for Etags.
+- Md5Stream: helper class to build up an md5 stream from an outputstream. Useful when generating e.g. ETags by serializing large object structures without buffering the entire thing in memory. Uses the Md5Appender. Simply stream your content and get the hash afterwards.
 - MiscUtils: equalsAny method that returns true if the first arg is equal to any of the remaining ones (varargs)
-- StrategyEvaluator: varargs and Optional based implementation of the strategy pattern
+- StrategyEvaluator: varargs and Optional based implementation of the strategy pattern. Nice alternative to having nested ifs with lots of null checks.
 - PatternEvaluator: lambda functions based implementation of matching a pattern and then doing something like you can in many functional languages.
-- IOUtils: helper methods to quickly work with streams and readers in a responsible way
-- Math: a few methods that are missing from java.lang.Math that are useful
+- IOUtils: helper methods to quickly work with streams and readers in a responsible way. Java IO requires a lot of boilerplate; this makes that a bit less verbose.
+- Math: a few methods that are missing from java.lang.Math that are useful to have around: `safeAbs` (the existing abs has edgecases), `long pow(long l, int exp)`, `double normalize(double i, double factor)` simple logistic function for getting a value between 0 and 1, `double round(double d, int decimals)`
 - MdcContext to have a way of temporarily adding attributes to the logging MDC with cleanup. MdcContext implements Closeable so you can use `try...finally`
+- SimpleStringTrie - a straightforward implemnentation of a Trie that uses HashMaps to implement a simple prefix tree. Nothing special, but we needed one and could not be bothered to pull in e.g. Apache Commons Collections.
 
 
 This library requires Java 8.
