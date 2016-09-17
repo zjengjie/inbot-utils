@@ -8,7 +8,7 @@ public class ReInitializingReference<V> {
     private volatile V instance;
     private final Supplier<V> initializer;
     private final ReentrantLock lock = new ReentrantLock();
-    private long lastInitialized=0;
+    private volatile long lastInitialized=0;
     private final long expirationInMillis;
 
     public ReInitializingReference(Supplier<V> supplier, long expiration, TimeUnit unit) {
