@@ -41,6 +41,10 @@ public class ArrayFoo {
         return "["+ StringUtils.join(ts,',') +"]";
     }
 
+    public static <T> String stringify(Collection<?> ts) {
+        return "["+ StringUtils.join(ts,',') +"]";
+    }
+
     public static <T> boolean arrayContains(T[] ts, T value) {
         if(ts==null) {
             return false;

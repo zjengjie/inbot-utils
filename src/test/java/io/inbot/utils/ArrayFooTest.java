@@ -1,10 +1,9 @@
 package io.inbot.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import io.inbot.utils.ArrayFoo;
+import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.testng.annotations.Test;
@@ -24,8 +23,15 @@ public class ArrayFooTest {
         assertThat(set.size()).isEqualTo(arr.length);
     }
 
-    public void shouldJsonify() {
+    public void shouldStringify() {
         String str = ArrayFoo.stringify(arr);
+        assertThat(str).startsWith("[");
+        assertThat(str).containsSequence(arr[0],",",arr[1]);
+        assertThat(str).endsWith("]");
+    }
+
+    public void shouldStringifyList() {
+        String str = ArrayFoo.stringify(Arrays.asList(arr));
         assertThat(str).startsWith("[");
         assertThat(str).containsSequence(arr[0],",",arr[1]);
         assertThat(str).endsWith("]");
