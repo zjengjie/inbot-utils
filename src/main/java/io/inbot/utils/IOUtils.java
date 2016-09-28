@@ -99,7 +99,7 @@ public class IOUtils {
         try {
             return resource(resourceOrFile).lines();
         } catch (IOException e) {
-            throw new IllegalStateException("cannot read resouce",e);
+            throw new IllegalStateException("cannot read resource",e);
         }
     }
 }
