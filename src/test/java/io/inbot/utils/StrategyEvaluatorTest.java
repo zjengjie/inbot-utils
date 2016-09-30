@@ -13,12 +13,14 @@ public class StrategyEvaluatorTest {
         // if you have no strategy, the result is always empty
         assertThat(StrategyEvaluator.evaluate()).isEqualTo(Optional.empty());
         // it works with just one strategy
-        assertThat(StrategyEvaluator.evaluate(() -> Optional.of(42))).isEqualTo(Optional.of(42));
+        Optional<Integer> result = StrategyEvaluator.evaluate(() -> Optional.of(42));
+        assertThat(result).isEqualTo(Optional.of(42));
         // it will pick the first non empty strategy
-        assertThat(StrategyEvaluator.evaluate(
+        Optional<Integer> result2 = StrategyEvaluator.evaluate(
                 () -> Optional.empty(),
                 () -> Optional.of(42),
-                () -> Optional.of(666))
+                () -> Optional.of(666));
+        assertThat(result2
         ).isEqualTo(Optional.of(42));
     }
 }
