@@ -6,9 +6,9 @@ import java.util.function.Supplier;
 
 public class ReInitializingReference<V> {
     private volatile V instance;
+    private volatile long lastInitialized=0;
     private final Supplier<V> initializer;
     private final ReentrantLock lock = new ReentrantLock();
-    private volatile long lastInitialized=0;
     private final long expirationInMillis;
 
     public ReInitializingReference(Supplier<V> supplier, long expiration, TimeUnit unit) {
@@ -29,6 +29,18 @@ public class ReInitializingReference<V> {
             }
         }
         return instance;
+    }
+
+    /**
+     * Forces reinitialization on next get()
+     */
+    public void reset() {
+        lock.lock();
+        try {
+            lastInitialized=0;
+        } finally {
+            lock.unlock();
+        }
     }
 
     private boolean needsReinitialization() {
