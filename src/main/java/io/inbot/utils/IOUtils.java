@@ -2,8 +2,10 @@ package io.inbot.utils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -93,6 +95,19 @@ public class IOUtils {
 
     public static String readString(InputStream is) {
         return readString(new BufferedReader(new InputStreamReader(is, UTF_8)));
+    }
+
+    public static byte[] readBytes(InputStream is) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try(InputStream bis = new BufferedInputStream(is)) {
+            int b;
+            while((b = bis.read()) >=0) {
+                bos.write(b);
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+        return bos.toByteArray();
     }
 
     public static Stream<String> lines(String resourceOrFile) {
