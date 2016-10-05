@@ -1,6 +1,6 @@
 # Introduction
 
-Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). It's where we put anything reusable/valuable enough that it would be inconvenient to not have around.
+Inbot-utils is a collection of utility classes that we use at [Inbot](http://inbot.io). It's where we put anything reusable/valuable enough that it would be inconvenient to not have around. Check it out, there's some good stuff in here.
 
 # Install from maven cental
 
@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.15</version>
+  <version>1.17</version>
 </dependency>
 ```
 
@@ -24,7 +24,7 @@ Currently these classes are included:
 - AESUtils: encrypt/decrypt blobs using AES with a randomized salt and specified key. This makes encryption easy, safe (AES cipher in CBC mode with PKCS7, 256 bit key), and free of boilerplate. Uses the bouncy-castle library so you don't have to deal with Oracle's restrictions on key length.
 - ArrayFoo: misc static methods for manipulating arrays and sets.
 - CompressionUtils: compress/decompess using gzip; convenient wrappers around the built in java compression classes. Reduce the amount of boiler plate needed for the simple job of compressing stuff.
-- HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up. 
+- HashUtils: misc utilities to create md5 sha1 and other hashes without having to deal with checked exceptions or arcane details on how to set this up.
 - Md5Appender: helper class to creat md5 hashes incrementally by appending objects to it. We use this for Etags.
 - Md5Stream: helper class to build up an md5 stream from an outputstream. Useful when generating e.g. ETags by serializing large object structures without buffering the entire thing in memory. Uses the Md5Appender. Simply stream your content and get the hash afterwards.
 - MiscUtils: equalsAny method that returns true if the first arg is equal to any of the remaining ones (varargs)
@@ -49,6 +49,11 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.17
+  - add reset method to ReinitializingReference that allows you to force a reinitilize before it is triggered automatically
+  - add a readBytes method to IOUtils that returns a byte array.
+- 1.16
+  - add stringify for collections as well in ArrayFoo
 - 1.15
   - Add SimpleStringTrie (we needed a Trie)
 - 1.14
