@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.17</version>
+  <version>1.18</version>
 </dependency>
 ```
 
@@ -49,6 +49,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.18
+  - Add new withContext method that takes a lambda in MdcContext as an alternative to try with resources.
 - 1.17
   - add reset method to ReinitializingReference that allows you to force a reinitilize before it is triggered automatically
   - add a readBytes method to IOUtils that returns a byte array.
