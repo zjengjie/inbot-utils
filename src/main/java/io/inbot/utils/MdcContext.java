@@ -2,6 +2,7 @@ package io.inbot.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.slf4j.MDC;
 
 public class MdcContext implements AutoCloseable {
@@ -24,6 +25,12 @@ public class MdcContext implements AutoCloseable {
     public void close() {
         for(String key:keys) {
             MDC.remove(key);
+        }
+    }
+
+    public static void withContext(Consumer<MdcContext> block) {
+        try(MdcContext ctx=MdcContext.create()) {
+            block.accept(ctx);
         }
     }
 
