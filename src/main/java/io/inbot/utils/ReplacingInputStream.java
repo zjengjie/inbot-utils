@@ -30,6 +30,14 @@ public class ReplacingInputStream extends FilterInputStream {
     }
 
     /**
+     * @param is input
+     * @return nested replacing stream that replaces \n\r (DOS) and \r (MAC) line endings with UNIX ones "\n".
+     */
+    public static InputStream newLineNormalizingInputStream(InputStream is) {
+        return new ReplacingInputStream(new ReplacingInputStream(is, "\n\r", "\n"), "\r", "\n");
+    }
+
+    /**
      * Replace occurances of pattern in the input. Note: input is assumed to be UTF-8 encoded. If not the case use byte[] based pattern and replacement.
      * @param in input
      * @param pattern pattern to replace.

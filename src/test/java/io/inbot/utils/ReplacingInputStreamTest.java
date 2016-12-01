@@ -4,6 +4,7 @@ import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -22,6 +23,23 @@ public class ReplacingInputStreamTest {
             {"abcdefghijk", "d","dd", "abcddefghijk"},
             {"", "d","dd", ""}
         };
+    }
+
+    @DataProvider
+    public Object[][] newlineSamples() {
+        return new Object[][] {
+            {"foo\n\rbar\r","foo\nbar\n"},
+            {"foo\rbar\r","foo\nbar\n"}
+        };
+    }
+
+    @Test(dataProvider="newlineSamples")
+    public void shouldFixNewlines(String input, String expected) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8));
+        try(InputStream ris = ReplacingInputStream.newLineNormalizingInputStream(bis)) {
+            String result = new String(IOUtils.readBytes(ris), StandardCharsets.UTF_8);
+            assertThat(result).isEqualTo(expected);
+        }
     }
 
     @Test(dataProvider="samples")
