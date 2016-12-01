@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.18</version>
+  <version>1.19</version>
 </dependency>
 ```
 
@@ -49,6 +49,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.19
+  - Add ReplacingInputStream with convenience method to fix dos and mac new lines
 - 1.18
   - Add new withContext method that takes a lambda in MdcContext as an alternative to try with resources.
 - 1.17
