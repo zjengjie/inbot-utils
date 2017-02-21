@@ -1,4 +1,4 @@
-package io.inbot.utils;
+package io.inbot.utils.maps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,11 +11,12 @@ import java.util.function.Supplier;
  * Map&lt;String,Integer&gt; map = hashMap(entry(&quot;one&quot;,1),entry(&quot;two&quot;,2));
  *
  * Use map with a supplier to create maps of any type.
+ * @param <V>
  *
  */
 public class MapFactory {
     @SafeVarargs
-    public static <K,V> Map<K,V> hashMap(Entry<K, V>...entries) {
+    public static <K,V> Map<K,V> map(Entry<K, V>...entries) {
         return map(() -> new HashMap<>(), entries);
     }
 
@@ -29,31 +30,28 @@ public class MapFactory {
     }
 
     public static <K,V> Entry<K,V> entry(K key, V value) {
-        return new SimpleEntry<>(key,value);
+        return new ImmutableMapEntry<>(key,value);
     }
 
-    public static class SimpleEntry<KEY, VALUE> implements Entry<KEY,VALUE> {
-        private final KEY key;
-        private final VALUE value;
+    public static <K,V> RichMap<K,V> richMap(Map<K,V> existing) {
+        return new DelegatingRichMap<>(existing);
+    }
 
-        public SimpleEntry(KEY key, VALUE value) {
-            this.key=key;
-            this.value=value;
-        }
+    @SafeVarargs
+    public static <K,V> RichMap<K,V> richMap(Map<K,V> existing, Entry<K, V>...entries) {
+        DelegatingRichMap<K, V> newMap = new DelegatingRichMap<>(existing);
+        newMap.put(entries);
+        return newMap;
+    }
 
-        @Override
-        public KEY getKey() {
-            return key;
-        }
+    @SafeVarargs
+    public static <K,V> RichMap<K,V> richMap(Entry<K, V>...entries) {
+        DelegatingRichMap<K, V> newMap = new DelegatingRichMap<>(new HashMap<>());
+        newMap.put(entries);
+        return newMap;
+    }
 
-        @Override
-        public VALUE getValue() {
-            return value;
-        }
-
-        @Override
-        public VALUE setValue(VALUE value) {
-            throw new UnsupportedOperationException("entries are immutable");
-        }
+    public static <K,V> RichMultiMap<K, V> multiMap() {
+        return new DelegatingRichMultiMap<>();
     }
 }
