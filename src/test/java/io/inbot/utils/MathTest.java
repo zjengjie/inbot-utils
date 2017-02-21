@@ -13,6 +13,17 @@ public class MathTest {
 
     public void shouldPow() {
         assertThat(Math.pow(2, 2)).isEqualTo(4l);
+        assertThat(Math.pow(-2, 3)).isEqualTo(-8l);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void shouldThrowIfExceedsMaxLong() {
+        Math.pow(Long.MAX_VALUE, 2);
+    }
+
+    @Test(expectedExceptions=IllegalArgumentException.class)
+    public void shouldThrowIfExceedsMinLong() {
+        Math.pow(Long.MIN_VALUE, 3);
     }
 
     public void shouldSafeAbs() {
