@@ -11,7 +11,6 @@ import java.util.function.Supplier;
  * Map&lt;String,Integer&gt; map = hashMap(entry(&quot;one&quot;,1),entry(&quot;two&quot;,2));
  *
  * Use map with a supplier to create maps of any type.
- * @param <V>
  *
  */
 public class MapFactory {
