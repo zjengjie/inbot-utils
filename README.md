@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.19</version>
+  <version>1.20</version>
 </dependency>
 ```
 
@@ -35,6 +35,7 @@ Currently these classes are included:
 - MdcContext to have a way of temporarily adding attributes to the logging MDC with cleanup. MdcContext implements Closeable so you can use `try...finally`
 - ReinitializingReference - allows you to periodically calculate something expensive in a thread safe way. When you get the reference, it checks whether it needs to be recalculated and if needed does so (blocks until done). If you've ever implemented double checked locking (or made the rooky mistake of not doing double locking or doing it wrong) to do something similar, this is a cleaner and safer way.
 - SimpleStringTrie - a straightforward implemnentation of a Trie that uses HashMaps to implement a simple prefix tree. Nothing special, but we needed one and could not be bothered to pull in e.g. Apache Commons Collections.
+- MapFactory with some convenience methods, a simple multi map implementation, a delegating map, and a RichMap interface with convenient default methods.
 
 
 This library requires Java 8.
@@ -49,6 +50,9 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.20
+  - Minor improvements to Math.pow
+  - Refactor MapFactory and add lots of functionality.
 - 1.19
   - Add ReplacingInputStream with convenience method to fix dos and mac new lines
 - 1.18
