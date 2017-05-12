@@ -2,6 +2,7 @@ package io.inbot.utils;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import com.google.common.io.CountingOutputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,7 +13,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -43,6 +47,32 @@ public class IOUtils {
             }
         }
     }
+
+    /**
+     * Calculate the serialized object size in bytes. This is a good indication of how much memory the object roughly takes.
+     * Note that this is typically not exactly the same for many objects.
+     * @param object any  object that implements {@link Serializable}
+     * @return number of bytes of the serialized object.
+     */
+    public long byteCount(Object object) {
+        try {
+            CountingOutputStream cos = new CountingOutputStream(new OutputStream() {
+                @Override
+                public void write(int b) throws IOException {
+                    // do nothing
+                }
+            });
+            ObjectOutputStream os = new ObjectOutputStream(cos);
+
+            os.writeObject(object);
+            os.flush();
+            os.close();
+            return cos.getCount();
+        } catch (IOException e) {
+            throw new IllegalStateException("error serializing object: " + e.getMessage(),e);
+        }
+    }
+
 
     public static BufferedWriter gzipFileWriter(String file) throws IOException {
         return new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(file)), UTF_8));
