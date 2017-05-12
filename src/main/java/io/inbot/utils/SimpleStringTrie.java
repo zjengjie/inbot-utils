@@ -34,7 +34,7 @@ public class SimpleStringTrie {
     /**
      * Useful if you want to build a trie for an existing map so you can figure out a matching prefix that has an entry
      * @param map a map
-     * @return a SimpleStringTrie for the map
+     * @return a SimpleStringTrie for the map.
      */
     public static SimpleStringTrie from(Map<String,?> map) {
         SimpleStringTrie st = new SimpleStringTrie();
