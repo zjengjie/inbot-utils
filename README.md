@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.21</version>
+  <version>1.23</version>
 </dependency>
 ```
 
@@ -50,6 +50,11 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.23
+  - bug fix for SimpleStringTrie
+- 1.22
+  - add utility method for streaming regex matches against a big string input
+  - add match method to SimpleStringTrie to allow for returning all strings in the trie that match a prefix.
 - 1.21
   - Add helper method to calculate serialized object size. Useful when you need to know how much heap some big object is taking roughly.
   - Add MdcAware for inheriting parent thread MDC when using multi threaded code with Runnable.
