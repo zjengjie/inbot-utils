@@ -42,5 +42,8 @@ public class SimpleStringTrieTest {
         assertThat(match.contains("foobar")).isTrue();
         assertThat(match.contains("bar")).isFalse();
 
+        List<String> match2 = trie.match("fff");
+        assertThat(match2.size()).isEqualTo(0);
+
     }
 }

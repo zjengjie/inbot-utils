@@ -120,7 +120,7 @@ public class SimpleStringTrie {
        }
        if(i>0 && currentNode.isLeaf()) {
            results.add(input); // fully matched against something
-       } else if(!currentNode.equals(root)) {
+       } else if(!currentNode.equals(root) && i == input.length()) {
            String matchedPrefix=input.substring(0,i);
            List<String> matches = currentNode.strings().map(s -> matchedPrefix + s).collect(Collectors.toList());
         return matches;
