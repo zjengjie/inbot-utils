@@ -2,6 +2,7 @@ package io.inbot.utils;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
+import java.util.List;
 import org.testng.annotations.Test;
 
 @Test
@@ -27,5 +28,19 @@ public class SimpleStringTrieTest {
         assertThat(trie.get("fooboooooo").get()).isEqualTo("fooboooooo");
         assertThat(trie.get("1234").get()).isEqualTo("1234");
         assertThat(trie.get("1230").get()).isEqualTo("123");
+    }
+
+    public void shouldMatch() {
+        SimpleStringTrie trie = new SimpleStringTrie();
+        trie.add("foofoo");
+        trie.add("foobar");
+        trie.add("bar");
+
+        List<String> match = trie.match("fo");
+
+        assertThat(match.contains("foofoo")).isTrue();
+        assertThat(match.contains("foobar")).isTrue();
+        assertThat(match.contains("bar")).isFalse();
+
     }
 }

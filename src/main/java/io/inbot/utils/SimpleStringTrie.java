@@ -1,8 +1,12 @@
 package io.inbot.utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Simple implementation of a Trie that may be used to match input strings to the longest matching prefix.
@@ -24,6 +28,21 @@ public class SimpleStringTrie {
 
         public boolean isLeaf() {
             return end;
+        }
+
+        public Stream<String> strings() {
+            if(isLeaf()) {
+                return Stream.empty();
+            } else {
+                return children.entrySet().stream().flatMap(entry -> {
+                    TrieNode n = entry.getValue();
+                    if(n.isLeaf()) {
+                        return Stream.of(""+ entry.getKey());
+                    } else {
+                        return n.strings().map(s -> "" + entry.getKey() +s);
+                    }
+                });
+            }
         }
     }
 
@@ -86,5 +105,27 @@ public class SimpleStringTrie {
             return Optional.of(input.substring(0, i));
         }
         return Optional.empty();
+   }
+
+   public List<String> match(String input) {
+       TrieNode currentNode = root;
+       int i=0;
+       List<String> results = new ArrayList<>();
+       for(char c: input.toCharArray()) {
+           TrieNode nextNode = currentNode.getChildren().get(c);
+           if(nextNode != null) {
+               i++;
+               currentNode=nextNode;
+           }
+       }
+       if(i>0 && currentNode.isLeaf()) {
+           results.add(input); // fully matched against something
+       } else if(!currentNode.equals(root)) {
+           String matchedPrefix=input.substring(0,i);
+           List<String> matches = currentNode.strings().map(s -> matchedPrefix + s).collect(Collectors.toList());
+        return matches;
+       }
+       return results;
+
    }
 }
