@@ -46,4 +46,16 @@ public class SimpleStringTrieTest {
         assertThat(match2.size()).isEqualTo(0);
 
     }
+
+    public void shouldReturnMatchingPrefix() {
+        SimpleStringTrie trie = new SimpleStringTrie();
+        trie.add("a");
+        trie.add("b");
+        trie.add("c");
+
+        List<String> match = trie.match("abc");
+        assertThat(match.contains("a")).isTrue();
+        assertThat(match.contains("abc")).isFalse();
+
+    }
 }
