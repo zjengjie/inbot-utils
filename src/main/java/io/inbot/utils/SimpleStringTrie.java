@@ -1,5 +1,6 @@
 package io.inbot.utils;
 
+import com.google.common.collect.Streams;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ public class SimpleStringTrie {
         private final Map<Character, TrieNode> children;
         boolean end=false;
 
-        public TrieNode(char ch) {
+        public TrieNode() {
             children = new HashMap<>();
         }
 
@@ -31,23 +32,19 @@ public class SimpleStringTrie {
         }
 
         public Stream<String> strings() {
-            if(isLeaf()) {
-                return Stream.empty();
-            } else {
                 return children.entrySet().stream().flatMap(entry -> {
                     TrieNode n = entry.getValue();
                     if(n.isLeaf()) {
-                        return Stream.of(""+ entry.getKey());
+                        return Streams.concat(Stream.of(""+ entry.getKey()), n.strings().map(s -> "" + entry.getKey() +s));
                     } else {
                         return n.strings().map(s -> "" + entry.getKey() +s);
                     }
                 });
-            }
         }
     }
 
     public SimpleStringTrie() {
-        root = new TrieNode((char) 0);
+        root = new TrieNode();
     }
 
     /**
@@ -74,12 +71,12 @@ public class SimpleStringTrie {
             if(matchingNode != null) {
                 currentNode = matchingNode;
             } else {
-                TrieNode newNode = new TrieNode(c);
+                TrieNode newNode = new TrieNode();
                 children.put(c, newNode);
                 currentNode = newNode;
             }
         }
-        currentNode.end=true;
+        currentNode.end=true; // this is the end of an input that was added, there may be more children
     }
 
     /**
@@ -108,7 +105,10 @@ public class SimpleStringTrie {
    }
 
    public List<String> match(String input) {
-       TrieNode currentNode = root;
+       return addMoreStrings(input,"",root);
+   }
+
+   private List<String> addMoreStrings(String input, String prefix, TrieNode currentNode) {
        int i=0;
        List<String> results = new ArrayList<>();
        for(char c: input.toCharArray()) {
@@ -118,14 +118,15 @@ public class SimpleStringTrie {
                currentNode=nextNode;
            }
        }
+       String matched = input.substring(0,i);
        if(i>0 && currentNode.isLeaf()) {
-           results.add(input.substring(0,i)); // fully matched against something
-       } else if(!currentNode.equals(root) && i == input.length()) {
-           String matchedPrefix=input.substring(0,i);
-           List<String> matches = currentNode.strings().map(s -> matchedPrefix + s).collect(Collectors.toList());
-        return matches;
+           results.add(prefix+matched); // fully matched against something
+       }
+       if(!currentNode.equals(root) && i == input.length()) {
+           results.addAll(currentNode.strings().map(s -> {
+               return prefix+matched + s;
+           }).collect(Collectors.toList()));
        }
        return results;
-
    }
 }

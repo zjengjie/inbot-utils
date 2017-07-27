@@ -2,6 +2,7 @@ package io.inbot.utils;
 
 import static org.assertj.core.api.StrictAssertions.assertThat;
 
+import com.beust.jcommander.internal.Lists;
 import java.util.List;
 import org.testng.annotations.Test;
 
@@ -30,6 +31,37 @@ public class SimpleStringTrieTest {
         assertThat(trie.get("1230").get()).isEqualTo("123");
     }
 
+    public void shouldProduceAllExceptAlbania() {
+        SimpleStringTrie trie = new SimpleStringTrie();
+        trie.add("australia");
+        trie.add("austria");
+        trie.add("albania");
+        assertThat(ArrayFoo.stringify(trie.match("au"))).contains("austria","australia");
+    }
+
+    public void shouldProduceAllNestedPrefixes() {
+        SimpleStringTrie trie = new SimpleStringTrie();
+        trie.add("ab");
+        trie.add("abc");
+        trie.add("abcd");
+        trie.add("abcde");
+        assertThat(trie.match("ab").size()).isEqualTo(4);
+        assertThat(ArrayFoo.stringify(trie.match("a"))).contains("ab","abc","abcd","abcde");
+        assertThat(trie.match("abc").size()).isEqualTo(3);
+        assertThat(ArrayFoo.stringify(trie.match("abc"))).contains("abc","abcd","abcde").doesNotContain("ab\"");
+    }
+
+    public void shouldProduceAllPostFixes() {
+        SimpleStringTrie trie = new SimpleStringTrie();
+
+        List<String> strings = Lists.newArrayList("a","aa","aaa","ab","abb","aab");
+        strings.forEach(trie::add);
+
+        List<String> matches = trie.match("a");
+        assertThat(matches.size()).isEqualTo(strings.size());
+
+    }
+
     public void shouldMatch() {
         SimpleStringTrie trie = new SimpleStringTrie();
         trie.add("foofoo");
@@ -44,7 +76,6 @@ public class SimpleStringTrieTest {
 
         List<String> match2 = trie.match("fff");
         assertThat(match2.size()).isEqualTo(0);
-
     }
 
     public void shouldReturnMatchingPrefix() {
