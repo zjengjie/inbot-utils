@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.24</version>
+  <version>1.25</version>
 </dependency>
 ```
 
@@ -50,6 +50,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.25
+  - fix bug with trie not returing all possible matches
 - 1.24
   - bug fix for SimpleStringTrie with new match method
 - 1.23
