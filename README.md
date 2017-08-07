@@ -10,7 +10,7 @@ Inbot-utils is a collection of utility classes that we use at [Inbot](http://inb
 <dependency>
   <groupId>io.inbot</groupId>
   <artifactId>inbot-utils</artifactId>
-  <version>1.25</version>
+  <version>1.26</version>
 </dependency>
 ```
 
@@ -50,6 +50,8 @@ Given the nature of this project and the license, we fully understand if people 
 
 
 # Changelog
+- 1.26
+  - Add EnumUtils with some nice helper methods
 - 1.25
   - fix bug with trie not returing all possible matches
 - 1.24
