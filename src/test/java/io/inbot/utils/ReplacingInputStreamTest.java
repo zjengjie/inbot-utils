@@ -21,7 +21,8 @@ public class ReplacingInputStreamTest {
             {"abcdefghijk", "def","", "abcghijk"},
             {"abcdefghijk", "def",null, "abcghijk"},
             {"abcdefghijk", "d","dd", "abcddefghijk"},
-            {"", "d","dd", ""}
+            {"", "d","dd", ""},
+            {"你好世界", "你好", "喂", "喂世界"}
         };
     }
 

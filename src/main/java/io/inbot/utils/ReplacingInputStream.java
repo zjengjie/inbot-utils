@@ -109,7 +109,7 @@ public class ReplacingInputStream extends FilterInputStream {
         case NOT_MATCHED:
             // we are not currently matching, replacing, or unbuffering
             next=super.read();
-            if(pattern[0] == next) {
+            if((pattern[0] & 0xff) == next) {
                 // clear whatever was there
                 buf=new int[pattern.length]; // clear whatever was there
                 // make sure we start at 0
@@ -133,7 +133,7 @@ public class ReplacingInputStream extends FilterInputStream {
         case MATCHING:
             // the previous bytes matched part of the pattern
             next=super.read();
-            if(pattern[matchedIndex]==next) {
+            if((pattern[matchedIndex] & 0xff)==next) {
                 buf[matchedIndex++]=next;
                 if(matchedIndex==pattern.length) {
                     // we've found a full match!
