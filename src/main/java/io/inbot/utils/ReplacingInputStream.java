@@ -17,8 +17,8 @@ public class ReplacingInputStream extends FilterInputStream {
     int unbufferIndex=0;
     int replacedIndex=0;
 
-    private final byte[] pattern;
-    private final byte[] replacement;
+    private final int[] pattern;
+    private final int[] replacement;
     private State state=State.NOT_MATCHED;
 
     // simple state machine for keeping track of what we are doing
@@ -57,10 +57,21 @@ public class ReplacingInputStream extends FilterInputStream {
         super(in);
         Validate.notNull(pattern);
         Validate.isTrue(pattern.length>0, "pattern length should be > 0", pattern.length);
-        this.pattern = pattern;
-        this.replacement = replacement;
+        this.pattern = toIntArray(pattern);
+        this.replacement = toIntArray(replacement);
         // we will never match more than the pattern length
         buf = new int[pattern.length];
+    }
+
+    private int[] toIntArray(byte[] bytes) {
+        if (bytes == null) {
+            return null;
+        }
+        int[] ints = new int[bytes.length];
+        for (int i = 0; i < bytes.length; i++) {
+            ints[i] = bytes[i] & 0xff;
+        }
+        return ints;
     }
 
     @Override
@@ -109,7 +120,7 @@ public class ReplacingInputStream extends FilterInputStream {
         case NOT_MATCHED:
             // we are not currently matching, replacing, or unbuffering
             next=super.read();
-            if((pattern[0] & 0xff) == next) {
+            if(pattern[0] == next) {
                 // clear whatever was there
                 buf=new int[pattern.length]; // clear whatever was there
                 // make sure we start at 0
@@ -133,7 +144,7 @@ public class ReplacingInputStream extends FilterInputStream {
         case MATCHING:
             // the previous bytes matched part of the pattern
             next=super.read();
-            if((pattern[matchedIndex] & 0xff)==next) {
+            if(pattern[matchedIndex]==next) {
                 buf[matchedIndex++]=next;
                 if(matchedIndex==pattern.length) {
                     // we've found a full match!
